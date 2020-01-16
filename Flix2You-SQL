@@ -1,0 +1,206 @@
+
+/* Drop tables that may already exist                                    */
+/* The following code is commented out
+   and is available for your use if you
+   need to drop all the tables
+
+DROP TABLE movie_cast;
+DROP TABLE financial_transactions;
+DROP TABLE accounts;
+DROP TABLE customer_rentals;
+DROP TABLE movies;
+DROP TABLE genre_codes;
+DROP TABLE format_types;
+DROP TABLE condition_codes;
+DROP TABLE actors;
+DROP TABLE customers;
+DROP TABLE rental_status_codes;
+DROP TABLE transaction_types;
+DROP TABLE payment_methods;
+DROP TABLE employees;
+DROP TABLE warehouse;
+DROP TABLE job_codes;
+DROP TABLE membership_information;
+DROP TABLE customer_sales;
+
+*/
+
+
+/* create tables */
+CREATE TABLE genre_codes(
+	genre_code int IDENTITY(1,1) NOT NULL,
+	genre_code_description varchar(32) NOT NULL);
+CREATE TABLE format_types(
+	format_type_code int IDENTITY(1,1) NOT NULL,
+	format_type_description varchar(32) NOT NULL);
+CREATE TABLE condition_codes(
+	condition_code int IDENTITY(1,1) NOT NULL,
+	condition_code_description varchar(32) NOT NULL);
+CREATE TABLE actors(
+	actor_id int IDENTITY(1,1) NOT NULL,
+	actor_gender char(1) NOT NULL,
+	actor_first_name varchar(32) NOT NULL,
+	actor_last_name varchar(32) NOT NULL,
+	other_actor_details varchar(512) NOT NULL);
+CREATE TABLE movies(
+	movie_id int IDENTITY(1,1) NOT NULL,
+	condition_code int NOT NULL,
+	format_type_code int NOT NULL,
+	genre_type_code int NOT NULL,
+	store_id int NOT NULL,
+	release_year int NOT NULL,
+	movie_title varchar(128) NOT NULL,
+	movie_description varchar(1024) NOT NULL,
+	number_in_stock int NOT NULL,
+	rental_or_sale_or_both tinyint NOT NULL,
+	rental_daily_rate money NOT NULL,
+	sales_price money NOT NULL);
+CREATE TABLE movie_cast(
+	movie_id int NOT NULL,
+	actor_id int NOT NULL);
+CREATE TABLE rental_status_codes(
+rental_status_code int IDENTITY(1,1) NOT NULL,
+rental_status_description varchar(150) NOT NULL);
+CREATE TABLE transaction_types(
+transaction_type_code int IDENTITY(1,1) NOT NULL,
+transaction_type_description varchar(150) NOT NULL);
+ 
+CREATE TABLE payment_methods(
+payment_method_code int IDENTITY(1,1) NOT NULL,
+payment_method_description varchar(150) NOT NULL);
+CREATE TABLE financial_transcations(
+transaction_id int IDENTITY(1,1) NOT NULL,
+account_id int NOT NULL,
+item_rental_id int NOT NULL,
+previous_transaction_id int NOT NULL,
+transaction_type_code int NULL,
+transaction_date datetime NULL,
+transaction_amount decimal(18,2) NULL,
+transaction_comment varchar(1000) NULL);
+CREATE TABLE accounts(
+account_id int IDENTITY(1,1) NOT NULL,
+customer_id int not null,
+payment_method_code int NOT NULL,
+account_name varchar(150) NOT NULL,
+account_details varchar(550) NOT NULL);
+CREATE TABLE customers(
+customer_id int IDENTITY(1,1) NOT NULL,
+member_vn int not null,
+membership_number int NOT NULL,
+date_became_member datetime NOT NULL,
+customer_first_name varchar(150) NOT NULL,
+customer_last_name varchar(150) NOT NULL,
+customer_address varchar(550) NOT NULL,
+customer_phone varchar(50) NOT NULL,
+customer_email varchar(150) NOT NULL,
+customer_dob datetime NOT NULL),
+CREATE TABLE customer_rentals(
+item_rental_id int IDENTITY(1,1) NOT NULL,
+customer_id int NOT NULL,
+movie_id int NOT NULL,
+rental_status_code int NOT NULL,
+rental_date_out datetime NOT NULL,
+rental_date_returned datetime NULL,
+rental_amount_due decimal (18, 2) NULL,
+other_rental_detail varchar (1000) NULL);
+CREATE TABLE employees(
+	employee_id int IDENTITY(1,1) NOT NULL,
+	warehouse_id int NOT NULL,
+	job_code int NOT NULL,
+	database_training_vn varchar(1000) NOT NULL,
+	employee_first_name varchar(32) NOT NULL,
+	employee_last_name varchar(32) NOT NULL,
+	employee_phone varchar(50) NOT NULL,
+	employee_email varchar(50) NOT NULL);
+CREATE TABLE warehouse(
+	warehouse_id int IDENTITY(1,1) NOT NULL,
+	warehouse_manager_id int NOT NULL,
+	warehouse_address varchar(128) NOT NULL,
+	warehouse_city varchar(32) NOT NULL,
+	warehouse_state varchar(2) NOT NULL,
+	warehouse_zip varchar(12) NOT NULL,
+	warehouse_phone int NOT NULL,
+	warehouse_email varchar(128) NOT NULL,
+	warehouse_filled_ytd varchar(50) NOT NULL,
+	other_warehouse_details varchar(1000) NULL);
+CREATE TABLE job_codes(
+	job_code int IDENTITY(1,1) NOT NULL,
+	job_description varchar(1000) NOT NULL);
+CREATE TABLE membership_information(
+	membership_number int IDENTITY(1,1) NOT NULL,
+	date_became_member datetime NOT NULL);
+CREATE TABLE customer_sales(
+item_sale_id int IDENTITY(1,1) NOT NULL,
+	customer_id int NOT NULL,
+	movie_id int NOT NULL,
+	date_of_sale datetime NOT NULL,
+	sale_amount_paid int NOT NULL,
+	other_sale_details varchar(1000) NULL);
+
+/* create primary keys with ALTER TABLE statement */
+ALTER TABLE genre_codes ADD CONSTRAINT pk_genre_codes PRIMARY KEY (genre_code);
+ALTER TABLE format_types ADD CONSTRAINT pk_format_types PRIMARY KEY (format_type_code);
+ALTER TABLE video_stores ADD CONSTRAINT pk_video_stores PRIMARY KEY (store_id);
+ALTER TABLE condition_codes ADD CONSTRAINT pk_condition_codes PRIMARY KEY (condition_code);
+ALTER TABLE actors ADD CONSTRAINT pk_actors PRIMARY KEY (actor_id);
+ALTER TABLE movies ADD CONSTRAINT pk_movies PRIMARY KEY (movie_id);
+ALTER TABLE movie_cast ADD CONSTRAINT pk_movie_cast PRIMARY KEY (movie_id, actor_id);
+ALTER TABLE customer_rentals ADD CONSTRAINT pk_item_rental_id PRIMARY KEY (item_rental_id);
+ALTER TABLE employees ADD CONSTRAINT pk_employees PRIMARY KEY(employee_id);
+ALTER TABLE job_codes ADD CONSTRAINT pk_job_codes PRIMARY KEY(job_code);
+ALTER TABLE warehouse ADD CONSTRAINT pk_warehouse PRIMARY KEY(warehouse_id);
+ALTER TABLE membership_information ADD CONSTRAINT pk_membership_information PRIMARY KEY(membership_number);
+ALTER TABLE customer_sales ADD CONSTRAINT pk_customer_sales PRIMARY KEY(item_sale_id);
+ALTER TABLE transaction_types ADD CONSTRAINT pk_transaction_type_code PRIMARY KEY (transaction_type_code);
+ALTER TABLE rental_status_codes ADD CONSTRAINT pk_rental_status_code PRIMARY KEY (rental_status_code);
+ALTER TABLE payment_methods ADD CONSTRAINT pk_payment_method_code PRIMARY KEY (payment_method_code);
+ALTER TABLE financial_transcations ADD CONSTRAINT pk_transaction_id PRIMARY KEY (transaction_id);
+ALTER TABLE accounts ADD CONSTRAINT pk_account_id PRIMARY KEY (account_id);
+ALTER TABLE customers ADD CONSTRAINT pk_customer_id PRIMARY KEY (customer_id);
+
+/*  end of primary key creation */
+
+/* create foreign keys */
+ALTER TABLE movie_cast ADD  CONSTRAINT fk_Movie_cast_actors FOREIGN KEY(actor_id)
+REFERENCES actors (actor_id);
+ALTER TABLE movie_cast ADD  CONSTRAINT fk_movie_cast_movies FOREIGN KEY(movie_id)
+REFERENCES movies (movie_id);
+ALTER TABLE  employees ADD  CONSTRAINT fk_employees_warehouse FOREIGN KEY(warehouse_id)
+REFERENCES warehouse (warehouse_id);
+ALTER TABLE employees ADD  CONSTRAINT fk_employees_job_codes FOREIGN KEY(job_code)
+REFERENCES job_codes (job_code);
+ALTER TABLE customer_sales ADD  CONSTRAINT fk_customer_sales_customers FOREIGN KEY(customer_id)
+REFERENCES customers (customer_id);
+ALTER TABLE customer_sales ADD  CONSTRAINT fk_customer_sales_movies FOREIGN KEY(movie_id)
+REFERENCES movies (movie_id);
+ALTER TABLE movies ADD  CONSTRAINT fk_movies_condition_codes FOREIGN KEY(condition_code)
+REFERENCES condition_codes (condition_code);
+ALTER TABLE movies ADD  CONSTRAINT fk_movies_format_types FOREIGN KEY(format_type_code)
+REFERENCES format_types (format_type_code);
+ALTER TABLE movies ADD  CONSTRAINT fk_movies_genre_codes FOREIGN KEY(genre_type_code)
+REFERENCES genre_codes (genre_code);
+ALTER TABLE movies ADD  CONSTRAINT fk_movies_video_Stores FOREIGN KEY(store_id)
+REFERENCES video_Stores (store_id);
+ALTER TABLE customer_rentals ADD CONSTRAINT fk_customer_rentals FOREIGN KEY(customer_id)
+REFERENCES customers (customer_id);
+ALTER TABLE customer_rentals ADD CONSTRAINT fk_movie_customer_rentals FOREIGN KEY(movie_id)
+REFERENCES movies (movie_id);
+ALTER TABLE customer_rentals ADD CONSTRAINT fk_customer_rental_codes FOREIGN KEY(rental_status_code)
+REFERENCES rental_status_codes (rental_status_code);
+ALTER TABLE financial_transcations ADD CONSTRAINT fk_transactions_account FOREIGN KEY(account_id)
+REFERENCES accounts (account_id);
+ALTER TABLE financial_transcations ADD CONSTRAINT fk_transactions_rental FOREIGN KEY(item_rental_id)
+REFERENCES customer_rentals (item_rental_id);
+ALTER TABLE financial_transcations ADD CONSTRAINT fk_transaction_previous FOREIGN KEY(previous_transaction_id)
+REFERENCES financial_transcations (transaction_id);
+ALTER TABLE financial_transcations ADD CONSTRAINT fk_transaction_codes FOREIGN KEY(transaction_type_code)
+REFERENCES transaction_types (transaction_type_code);
+ALTER TABLE accounts ADD CONSTRAINT fk_customer_accounts FOREIGN KEY(customer_id)
+REFERENCES customers (customer_id);
+ALTER TABLE accounts ADD CONSTRAINT fk_customer_payments FOREIGN KEY(payment_method_code)
+REFERENCES payment_methods (payment_method_code);
+
+
+
+/* END OF SCRIPT */
+
